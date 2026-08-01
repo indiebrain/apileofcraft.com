@@ -1,0 +1,33 @@
+{{/*
+  Manual light/dark switch. The page already follows the operating-system
+  preference through CSS; this lets a reader override it. The chosen value is
+  stored so it survives navigation, and applied before paint (see head.html) to
+  avoid a flash of the wrong theme.
+*/}}
+<button class="theme-toggle" type="button" id="theme-toggle" aria-pressed="false">
+  <span class="theme-toggle__label">Bench light: on</span>
+</button>
+<script>
+  (function () {
+    var btn = document.getElementById('theme-toggle');
+    var root = document.documentElement;
+    var label = btn.querySelector('.theme-toggle__label');
+    function isDark() {
+      var t = root.getAttribute('data-theme');
+      if (t) return t === 'dark';
+      return window.matchMedia('(prefers-color-scheme: dark)').matches;
+    }
+    function sync() {
+      var dark = isDark();
+      btn.setAttribute('aria-pressed', String(dark));
+      label.textContent = dark ? 'Bench light: off' : 'Bench light: on';
+    }
+    btn.addEventListener('click', function () {
+      var next = isDark() ? 'light' : 'dark';
+      root.setAttribute('data-theme', next);
+      try { localStorage.setItem('apoc-theme', next); } catch (e) {}
+      sync();
+    });
+    sync();
+  })();
+</script>

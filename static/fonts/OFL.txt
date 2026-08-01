@@ -1,0 +1,13 @@
+Anton is licensed under the SIL Open Font License, Version 1.1.
+
+Copyright the Anton Project Authors (https://github.com/googlefonts/anton).
+
+The bundled file `anton-v27-latin.woff2` is the Latin subset of Anton v27 as
+distributed by Google Fonts. The full license text is available at:
+
+  https://openfontlicense.org/open-font-license-official-text/
+
+The SIL Open Font License permits bundling, redistribution, and self-hosting of
+the font, including for commercial use, provided the font is not sold on its own
+and this license notice is retained. The font is used here only as a display
+typeface for headings.

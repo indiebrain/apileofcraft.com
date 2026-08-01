@@ -1,6 +1,7 @@
 {{ define "main" }}
   <article class="wrap post">
     <header class="post__header">
+      {{ with .CurrentSection }}<p class="post__kicker">{{ .Title }}</p>{{ end }}
       <h1 class="post__title">{{ .Title }}</h1>
       <div class="post__meta">
         {{ $makers := partial "func/aslist.html" .Params.makers }}

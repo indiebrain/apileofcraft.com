@@ -1,5 +1,16 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+
+{{/* Apply a stored theme before paint so there is no flash of the wrong one. */}}
+<script>
+  try {
+    var t = localStorage.getItem('apoc-theme');
+    if (t === 'light' || t === 'dark') document.documentElement.setAttribute('data-theme', t);
+  } catch (e) {}
+</script>
+
+{{/* Preload the display face so headings don't reflow on first paint. */}}
+<link rel="preload" href="{{ "/fonts/anton-v27-latin.woff2" | relURL }}" as="font" type="font/woff2" crossorigin>
 {{ $title := cond .IsHome site.Title (printf "%s · %s" .Title site.Title) }}
 <title>{{ $title }}</title>
 <meta name="description" content="{{ with .Description }}{{ . }}{{ else }}{{ site.Params.description }}{{ end }}">

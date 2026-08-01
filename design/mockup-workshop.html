@@ -1,0 +1,385 @@
+<title>A Pile of Craft — Workshop design</title>
+<style>
+  /* ============================================================= TOKENS === */
+  :root {
+    color-scheme: light dark;
+
+    --paper:   #e8ddc7;   /* kraft ground        */
+    --board:   #ded1b6;   /* slightly darker board behind cards */
+    --card:    #f5eedd;   /* card stock          */
+    --ink:     #201a12;   /* body text  12.8:1   */
+    --ink-soft:#43371f;   /* meta text   8.6:1   */
+    --link:    #6e1a0e;   /* oxblood     8.6:1   */
+    --accent:  #a62e19;   /* vermilion, large/deco */
+    --mark:    #1c5e54;   /* teal, large/deco    */
+    --rule:    #c9b896;
+    --tape:    rgba(196, 176, 130, 0.55);
+    --focus:   #0b4fd6;
+    --shadow:  rgba(60, 44, 20, 0.28);
+
+    --measure: 64ch;
+    --wrap: 74rem;
+
+    --font-display: "Arial Black", "Helvetica Neue", system-ui, sans-serif;
+    --font-body: "Iowan Old Style", "Palatino Linotype", Georgia, serif;
+    --font-mono: ui-monospace, "SF Mono", "Cascadia Code", Menlo, monospace;
+
+    --paper-fiber:
+      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.05'/%3E%3C/svg%3E");
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --paper:   #191510;
+      --board:   #221d15;
+      --card:    #241f17;
+      --ink:     #f1e9d6;
+      --ink-soft:#c9bca0;
+      --link:    #f0b072;
+      --accent:  #e9a05c;
+      --mark:    #7fc9bb;
+      --rule:    #3a3225;
+      --tape:    rgba(120, 104, 74, 0.45);
+      --focus:   #7fb0ff;
+      --shadow:  rgba(0, 0, 0, 0.55);
+    }
+  }
+  /* Explicit toggle wins over the media query in both directions. */
+  :root[data-theme="light"] {
+    --paper:#e8ddc7; --board:#ded1b6; --card:#f5eedd; --ink:#201a12;
+    --ink-soft:#43371f; --link:#6e1a0e; --accent:#a62e19; --mark:#1c5e54;
+    --rule:#c9b896; --tape:rgba(196,176,130,0.55); --focus:#0b4fd6; --shadow:rgba(60,44,20,0.28);
+  }
+  :root[data-theme="dark"] {
+    --paper:#191510; --board:#221d15; --card:#241f17; --ink:#f1e9d6;
+    --ink-soft:#c9bca0; --link:#f0b072; --accent:#e9a05c; --mark:#7fc9bb;
+    --rule:#3a3225; --tape:rgba(120,104,74,0.45); --focus:#7fb0ff; --shadow:rgba(0,0,0,0.55);
+  }
+
+  /* ============================================================== BASE ==== */
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background-color: var(--paper);
+    background-image: var(--paper-fiber);
+    color: var(--ink);
+    font-family: var(--font-body);
+    font-size: clamp(1rem, 0.94rem + 0.3vw, 1.15rem);
+    line-height: 1.65;
+    -webkit-font-smoothing: antialiased;
+  }
+  img { max-width: 100%; display: block; }
+  a { color: var(--link); text-underline-offset: 0.16em; text-decoration-thickness: 2px; }
+  a:hover { text-decoration-thickness: 3px; }
+  :focus-visible { outline: 3px solid var(--focus); outline-offset: 3px; border-radius: 2px; }
+
+  .wrap { width: 100%; max-width: var(--wrap); margin-inline: auto; padding-inline: clamp(1rem, 4vw, 2.5rem); }
+
+  .mono {
+    font-family: var(--font-mono);
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    font-size: 0.72rem;
+  }
+
+  /* Little kraft tag used for section + nav labels */
+  .tag-label {
+    display: inline-block;
+    font-family: var(--font-mono);
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    font-size: 0.7rem;
+    color: var(--ink);
+    background: var(--card);
+    border: 1.5px solid var(--ink);
+    padding: 0.3rem 0.7rem;
+    box-shadow: 2px 2px 0 var(--ink);
+  }
+
+  /* Hand-drawn squiggle divider */
+  .squiggle { display: block; width: 100%; height: 14px; color: var(--accent); }
+  .squiggle path { stroke: currentColor; stroke-width: 3; fill: none; stroke-linecap: round; }
+
+  /* =========================================================== HEADER ===== */
+  .site-header { border-bottom: 3px solid var(--ink); background: var(--board); }
+  .site-header__inner {
+    display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between;
+    gap: 1rem 2rem; padding-block: 1.4rem;
+  }
+  .brand { display: flex; align-items: baseline; gap: 0.9rem; text-decoration: none; color: var(--ink); }
+  .brand__mark { font-size: 1.5rem; line-height: 1; }
+  .brand__name {
+    font-family: var(--font-display); font-weight: 900; text-transform: uppercase;
+    letter-spacing: -0.02em; font-size: clamp(1.25rem, 1rem + 1.2vw, 1.7rem); line-height: 1;
+  }
+  .brand__tag { font-family: var(--font-mono); font-size: 0.7rem; letter-spacing: 0.08em; color: var(--ink-soft); }
+  nav[aria-label] ul { display: flex; gap: 0.6rem; list-style: none; margin: 0; padding: 0; flex-wrap: wrap; }
+  .navlink {
+    display: inline-block; text-decoration: none; color: var(--ink);
+    font-family: var(--font-mono); text-transform: uppercase; letter-spacing: 0.12em; font-size: 0.72rem;
+    padding: 0.4rem 0.7rem; border: 1.5px solid transparent;
+  }
+  .navlink:hover { border-color: var(--ink); }
+  .navlink[aria-current="page"] { border-color: var(--ink); background: var(--card); box-shadow: 2px 2px 0 var(--ink); }
+
+  .theme-toggle {
+    font-family: var(--font-mono); text-transform: uppercase; letter-spacing: 0.1em; font-size: 0.68rem;
+    cursor: pointer; color: var(--ink); background: var(--card);
+    border: 1.5px solid var(--ink); padding: 0.4rem 0.7rem; box-shadow: 2px 2px 0 var(--ink);
+  }
+  .theme-toggle:active { transform: translate(2px, 2px); box-shadow: none; }
+
+  /* ============================================================= HERO ===== */
+  .hero { padding-block: clamp(2.5rem, 7vw, 5rem) 1.5rem; }
+  .hero__title {
+    font-family: var(--font-display); font-weight: 900; text-transform: uppercase;
+    letter-spacing: -0.03em; line-height: 0.92; margin: 0.6rem 0 0;
+    font-size: clamp(2.6rem, 1.4rem + 7vw, 6rem); text-wrap: balance;
+  }
+  .hero__title em { font-style: normal; color: var(--accent); }
+  .hero__lede { max-width: 34ch; font-size: clamp(1.1rem, 1rem + 0.6vw, 1.4rem); color: var(--ink-soft); margin: 1.4rem 0 0; }
+
+  /* =========================================================== SECTION ==== */
+  .section-head { display: flex; align-items: center; gap: 1rem; margin: 3rem 0 1.8rem; }
+  .section-head__rule { flex: 1; height: 0; border-top: 2px dashed var(--rule); }
+
+  /* ============================================================ CARDS ===== */
+  .board { padding-bottom: 3rem; }
+  .cards { list-style: none; margin: 0; padding: 0; display: grid; gap: clamp(1.6rem, 4vw, 2.6rem); }
+  @media (min-width: 42rem) { .cards { grid-template-columns: repeat(2, 1fr); } }
+  @media (min-width: 66rem) { .cards { grid-template-columns: repeat(3, 1fr); } }
+
+  .card { position: relative; }
+  .card__inner {
+    position: relative; height: 100%; display: flex; flex-direction: column;
+    background: var(--card); border: 2px solid var(--ink);
+    box-shadow: 6px 7px 0 var(--shadow);
+    transition: transform 160ms ease, box-shadow 160ms ease;
+  }
+  /* Each card pinned at a slight, varied tilt */
+  .card:nth-child(3n+1) .card__inner { transform: rotate(-1.1deg); }
+  .card:nth-child(3n+2) .card__inner { transform: rotate(0.7deg); }
+  .card:nth-child(3n+3) .card__inner { transform: rotate(-0.4deg); }
+  .card__inner:hover, .card:focus-within .card__inner {
+    transform: rotate(0deg) translateY(-4px); box-shadow: 8px 10px 0 var(--shadow);
+  }
+  /* Strip of tape across a top corner */
+  .card__inner::before {
+    content: ""; position: absolute; top: -12px; left: 50%; width: 92px; height: 26px;
+    transform: translateX(-50%) rotate(-3deg); background: var(--tape);
+    border-left: 1px dashed rgba(0,0,0,0.15); border-right: 1px dashed rgba(0,0,0,0.15);
+  }
+  .card__media { border-bottom: 2px solid var(--ink); aspect-ratio: 16 / 11; overflow: hidden; }
+  .card__media svg { width: 100%; height: 100%; }
+  .card__body { padding: 1.1rem 1.3rem 1.4rem; display: flex; flex-direction: column; gap: 0.55rem; }
+  .card__meta { color: var(--ink-soft); }
+  .card__title {
+    font-family: var(--font-display); font-weight: 900; text-transform: uppercase;
+    letter-spacing: -0.01em; line-height: 1.02; margin: 0; font-size: 1.5rem; text-wrap: balance;
+  }
+  .card__title a { color: var(--ink); text-decoration: none; }
+  .card__title a:hover { color: var(--accent); }
+  .card__maker { font-family: var(--font-mono); font-size: 0.74rem; letter-spacing: 0.06em; margin: 0; }
+  .card__maker a { color: var(--link); }
+  .card__summary { margin: 0; color: var(--ink); }
+  .chips { display: flex; flex-wrap: wrap; gap: 0.4rem; margin: 0.3rem 0 0; padding: 0; list-style: none; }
+  .chip {
+    font-family: var(--font-mono); font-size: 0.66rem; text-transform: uppercase; letter-spacing: 0.08em;
+    color: var(--ink); text-decoration: none; border: 1.5px solid var(--ink); padding: 0.2rem 0.55rem;
+    border-radius: 999px;
+  }
+  .chip:hover { background: var(--ink); color: var(--card); }
+
+  /* ============================================================ POST ====== */
+  .reading { background: var(--board); border-top: 3px solid var(--ink); border-bottom: 3px solid var(--ink); padding-block: clamp(2.5rem, 6vw, 4.5rem); margin-top: 3.5rem; }
+  .post { max-width: var(--measure); margin-inline: auto; }
+  .post__kicker { color: var(--mark); }
+  .post__title {
+    font-family: var(--font-display); font-weight: 900; text-transform: uppercase; letter-spacing: -0.02em;
+    line-height: 0.98; margin: 0.5rem 0 0.8rem; font-size: clamp(2rem, 1.3rem + 3.5vw, 3.4rem); text-wrap: balance;
+  }
+  .post__meta { font-family: var(--font-mono); font-size: 0.76rem; letter-spacing: 0.06em; color: var(--ink-soft); margin: 0; }
+  .post__meta a { color: var(--link); }
+  .post__figure { margin: 1.8rem 0; border: 2px solid var(--ink); box-shadow: 6px 7px 0 var(--shadow); background: var(--card); }
+  .post__figure svg { width: 100%; height: auto; display: block; }
+  .post__figure figcaption { font-family: var(--font-mono); font-size: 0.72rem; letter-spacing: 0.04em; color: var(--ink-soft); padding: 0.6rem 0.9rem; border-top: 2px solid var(--ink); }
+  .post__body > * + * { margin-top: 1.2em; }
+  .post__body h2 { font-family: var(--font-display); font-weight: 900; text-transform: uppercase; letter-spacing: -0.01em; font-size: 1.35rem; margin-top: 2rem; }
+  .post__body blockquote {
+    margin: 1.6rem 0; padding: 0.4rem 0 0.4rem 1.2rem; border-left: 5px solid var(--accent);
+    font-style: italic; color: var(--ink);
+  }
+
+  /* =========================================================== FOOTER ===== */
+  .site-footer { padding-block: 2.4rem; }
+  .site-footer__inner { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 0.6rem 1.5rem; font-family: var(--font-mono); font-size: 0.72rem; letter-spacing: 0.06em; color: var(--ink-soft); }
+  .site-footer a { color: var(--link); }
+
+  /* ========================================================== MOTION ====== */
+  @media (prefers-reduced-motion: reduce) {
+    * { transition-duration: 0.001ms !important; }
+    .card__inner { transform: none !important; }
+    .card__inner:hover, .card:focus-within .card__inner { transform: none !important; }
+  }
+</style>
+
+<header class="site-header">
+  <div class="wrap site-header__inner">
+    <a class="brand" href="#">
+      <span class="brand__mark" aria-hidden="true">✚</span>
+      <span>
+        <span class="brand__name">A Pile of Craft</span><br>
+        <span class="brand__tag">the things made on my street</span>
+      </span>
+    </a>
+    <nav aria-label="Primary">
+      <ul>
+        <li><a class="navlink" href="#" aria-current="page">Craft</a></li>
+        <li><a class="navlink" href="#">Makers</a></li>
+        <li><a class="navlink" href="#">About</a></li>
+      </ul>
+    </nav>
+    <button class="theme-toggle" type="button" id="themeToggle" aria-pressed="false">Bench light: on</button>
+  </div>
+</header>
+
+<main>
+  <section class="wrap hero" aria-labelledby="hero-title">
+    <span class="tag-label">Field notes · no. 001–</span>
+    <h1 class="hero__title" id="hero-title">Made<br>on <em>my</em><br>street.</h1>
+    <p class="hero__lede">One thing at a time, made by one neighbor — what it is, how it came together, and why they bothered.</p>
+    <svg class="squiggle" viewBox="0 0 600 14" preserveAspectRatio="none" aria-hidden="true">
+      <path d="M2 8 Q 30 2, 60 8 T 120 8 T 180 8 T 240 8 T 300 8 T 360 8 T 420 8 T 480 8 T 540 8 T 598 8"/>
+    </svg>
+  </section>
+
+  <section class="wrap board" aria-labelledby="feed-head">
+    <div class="section-head">
+      <span class="tag-label" id="feed-head">Latest off the bench</span>
+      <span class="section-head__rule" aria-hidden="true"></span>
+    </div>
+
+    <ul class="cards">
+      <!-- Card 1 -->
+      <li class="card">
+        <article class="card__inner">
+          <div class="card__media" aria-hidden="true">
+            <svg viewBox="0 0 320 220" role="img"><rect width="320" height="220" fill="#c9d3bd"/><rect y="150" width="320" height="70" fill="#aeb996"/><rect x="150" y="86" width="20" height="120" fill="#8a7355"/><rect x="128" y="70" width="64" height="52" rx="3" fill="#2f8f8a"/><polygon points="120,70 160,42 200,70" fill="#a62e19"/><circle cx="160" cy="94" r="9" fill="#201a12"/></svg>
+          </div>
+          <div class="card__body">
+            <p class="card__meta mono">28 Jul 2026 · Woodworking</p>
+            <h3 class="card__title"><a href="#the-corner-birdhouse">The Corner Birdhouse</a></h3>
+            <p class="card__maker">by <a href="#">Rosa Delgado</a></p>
+            <p class="card__summary">A fallen maple branch, a jar of leftover teal paint, and a sliding floor sized for chickadees and nobody bigger.</p>
+            <ul class="chips">
+              <li><a class="chip" href="#">woodworking</a></li>
+              <li><a class="chip" href="#">outdoors</a></li>
+            </ul>
+          </div>
+        </article>
+      </li>
+
+      <!-- Card 2 -->
+      <li class="card">
+        <article class="card__inner">
+          <div class="card__media" aria-hidden="true">
+            <svg viewBox="0 0 320 220" role="img"><rect width="320" height="220" fill="#e4c79a"/><ellipse cx="160" cy="132" rx="96" ry="70" fill="#b5793d"/><ellipse cx="160" cy="122" rx="78" ry="54" fill="#d69a55"/><path d="M120 108 q40 -26 80 0" stroke="#7a4a1e" stroke-width="4" fill="none"/></svg>
+          </div>
+          <div class="card__body">
+            <p class="card__meta mono">21 Jul 2026 · Baking</p>
+            <h3 class="card__title"><a href="#">Sourdough, Finally</a></h3>
+            <p class="card__maker">by <a href="#">Marcus Bell</a></p>
+            <p class="card__summary">Eleven weeks of feeding a jar of flour and water before the crumb finally opened up the way he wanted.</p>
+            <ul class="chips">
+              <li><a class="chip" href="#">baking</a></li>
+              <li><a class="chip" href="#">kitchen</a></li>
+            </ul>
+          </div>
+        </article>
+      </li>
+
+      <!-- Card 3 -->
+      <li class="card">
+        <article class="card__inner">
+          <div class="card__media" aria-hidden="true">
+            <svg viewBox="0 0 320 220" role="img"><rect width="320" height="220" fill="#efe7d6"/><g><rect x="20" y="20" width="70" height="70" fill="#a62e19"/><rect x="90" y="20" width="70" height="70" fill="#1c5e54"/><rect x="160" y="20" width="70" height="70" fill="#d69a55"/><rect x="230" y="20" width="70" height="70" fill="#3a5a8a"/><rect x="20" y="90" width="70" height="70" fill="#1c5e54"/><rect x="90" y="90" width="70" height="70" fill="#d69a55"/><rect x="160" y="90" width="70" height="70" fill="#a62e19"/><rect x="230" y="90" width="70" height="70" fill="#8a7355"/></g></svg>
+          </div>
+          <div class="card__body">
+            <p class="card__meta mono">09 Jul 2026 · Textiles</p>
+            <h3 class="card__title"><a href="#">The Mended Quilt</a></h3>
+            <p class="card__maker">by <a href="#">Nadia Osei</a></p>
+            <p class="card__summary">Her grandmother's quilt, rebuilt square by square from worn-out shirts the whole street donated.</p>
+            <ul class="chips">
+              <li><a class="chip" href="#">textiles</a></li>
+              <li><a class="chip" href="#">mending</a></li>
+            </ul>
+          </div>
+        </article>
+      </li>
+    </ul>
+  </section>
+
+  <!-- Reading view -->
+  <section class="reading" aria-labelledby="the-corner-birdhouse">
+    <div class="wrap">
+      <article class="post">
+        <p class="post__kicker mono">Craft · No. 001</p>
+        <h2 class="post__title" id="the-corner-birdhouse">The Corner Birdhouse</h2>
+        <p class="post__meta">Made by <a href="#">Rosa Delgado</a> &nbsp;·&nbsp; 28 Jul 2026 &nbsp;·&nbsp; 3 min read</p>
+
+        <figure class="post__figure">
+          <svg viewBox="0 0 800 460" role="img" aria-label="A teal peaked-roof birdhouse mounted on a weathered fence post.">
+            <rect width="800" height="460" fill="#d8dcc4"/><rect y="330" width="800" height="130" fill="#aeb996"/>
+            <rect x="378" y="210" width="44" height="250" fill="#8a7355"/>
+            <rect x="330" y="176" width="140" height="118" rx="6" fill="#2f8f8a"/>
+            <polygon points="312,176 400,110 488,176" fill="#a62e19"/>
+            <circle cx="400" cy="224" r="22" fill="#201a12"/>
+            <rect x="388" y="252" width="24" height="9" rx="4" fill="#5a4a34"/>
+          </svg>
+          <figcaption>The birdhouse on Rosa's fence, three days after the first tenant moved in.</figcaption>
+        </figure>
+
+        <div class="post__body">
+          <p>Rosa lives at the corner where the street bends toward the park. This spring a storm took down half of her old maple, and instead of hauling the wood to the curb she kept the straightest branch and let it dry in her garage.</p>
+          <h2>What she made</h2>
+          <p>A birdhouse, but a particular one: peaked roof, a single 32&nbsp;mm entrance hole — sized, she told me, for chickadees and nobody bigger — and a floor that slides out so it can be cleaned at the end of the season.</p>
+          <blockquote>"I didn't buy a thing for it. That was the whole point." — Rosa</blockquote>
+          <p>If you walk past the corner in the early morning, slow down. There is usually something happening at the little teal house.</p>
+          <ul class="chips">
+            <li><a class="chip" href="#">woodworking</a></li>
+            <li><a class="chip" href="#">outdoors</a></li>
+          </ul>
+        </div>
+      </article>
+    </div>
+  </section>
+</main>
+
+<footer class="site-footer">
+  <div class="wrap site-footer__inner">
+    <span>A Pile of Craft · built by hand on one street</span>
+    <span><a href="#">Subscribe by RSS</a> · © 2026</span>
+  </div>
+</footer>
+
+<script>
+  (function () {
+    var btn = document.getElementById('themeToggle');
+    var root = document.documentElement;
+    function isDark() {
+      var t = root.getAttribute('data-theme');
+      if (t) return t === 'dark';
+      return window.matchMedia('(prefers-color-scheme: dark)').matches;
+    }
+    function sync() {
+      var dark = isDark();
+      btn.setAttribute('aria-pressed', String(dark));
+      btn.textContent = dark ? 'Bench light: off' : 'Bench light: on';
+    }
+    btn.addEventListener('click', function () {
+      root.setAttribute('data-theme', isDark() ? 'light' : 'dark');
+      sync();
+    });
+    sync();
+  })();
+</script>

@@ -1,11 +1,15 @@
 {{ define "main" }}
   <section class="wrap home-hero">
-    <h1 class="home-hero__title">{{ site.Title }}</h1>
-    <p class="home-hero__lede">{{ site.Params.tagline }}</p>
+    <p class="tag-label">Field notes &middot; no. 001&ndash;</p>
+    <h1 class="home-hero__title">{{ site.Params.tagline }}</h1>
+    <p class="home-hero__lede">{{ site.Params.description }}</p>
+    <svg class="squiggle" viewBox="0 0 600 14" preserveAspectRatio="none" aria-hidden="true">
+      <path d="M2 8 Q 30 2, 60 8 T 120 8 T 180 8 T 240 8 T 300 8 T 360 8 T 420 8 T 480 8 T 540 8 T 598 8"/>
+    </svg>
   </section>
 
   <section class="wrap home-feed" aria-label="Latest craft">
-    <h2 class="section-heading">Latest craft</h2>
+    <h2 class="section-heading">Latest off the bench</h2>
     {{ $posts := where site.RegularPages "Section" "posts" }}
     {{ if $posts }}
       <ul class="post-list">
