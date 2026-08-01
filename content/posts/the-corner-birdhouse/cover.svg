@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 800" role="img" aria-label="A teal peaked-roof birdhouse on a fence post.">
+  <rect width="1280" height="800" fill="#e8e2d4"/>
+  <rect y="560" width="1280" height="240" fill="#c9d3bd"/>
+  <!-- fence post -->
+  <rect x="600" y="360" width="80" height="440" fill="#8a7355"/>
+  <rect x="600" y="360" width="80" height="440" fill="url(#grain)" opacity="0.25"/>
+  <!-- birdhouse body -->
+  <rect x="520" y="300" width="240" height="200" rx="6" fill="#2f8f8a"/>
+  <!-- roof -->
+  <polygon points="500,300 640,190 780,300" fill="#7a3b12"/>
+  <!-- entrance hole -->
+  <circle cx="640" cy="380" r="34" fill="#14120e"/>
+  <!-- perch -->
+  <rect x="628" y="430" width="24" height="10" rx="4" fill="#5a4a34"/>
+  <defs>
+    <linearGradient id="grain" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#000" stop-opacity="0"/>
+      <stop offset="0.5" stop-color="#000" stop-opacity="0.4"/>
+      <stop offset="1" stop-color="#000" stop-opacity="0"/>
+    </linearGradient>
+  </defs>
+</svg>

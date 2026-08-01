@@ -1,0 +1,24 @@
+{{ define "main" }}
+  <div class="wrap">
+    <header class="page-header">
+      <h1 class="page-header__title">{{ .Title }}</h1>
+      {{ with .Content }}<div class="page-header__intro">{{ . }}</div>{{ end }}
+    </header>
+
+    {{ $pages := .Pages }}
+    {{ if .Paginator }}
+      {{ $pages = (.Paginate .RegularPagesRecursive).Pages }}
+    {{ end }}
+
+    {{ if $pages }}
+      <ul class="post-list">
+        {{ range $pages }}
+          {{ partial "post-card.html" . }}
+        {{ end }}
+      </ul>
+      {{ if .Paginator }}{{ partial "pagination.html" . }}{{ end }}
+    {{ else }}
+      <p class="empty-state">Nothing here yet.</p>
+    {{ end }}
+  </div>
+{{ end }}

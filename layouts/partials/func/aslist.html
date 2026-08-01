@@ -1,0 +1,22 @@
+{{/*
+  Normalize a front-matter value into a clean string slice.
+
+  Org mode delivers `#+MAKER:` / `#+TAGS:` as a single comma-separated string,
+  while Markdown/TOML front matter delivers a real slice. This partial accepts
+  either and always returns a trimmed, empty-free slice via `return`.
+
+  Usage: {{ $makers := partial "func/aslist.html" .Params.maker }}
+*/}}
+{{ $out := slice }}
+{{ if reflect.IsSlice . }}
+  {{ range . }}
+    {{ $v := trim (printf "%v" .) " " }}
+    {{ if $v }}{{ $out = $out | append $v }}{{ end }}
+  {{ end }}
+{{ else if . }}
+  {{ range split (printf "%v" .) "," }}
+    {{ $v := trim . " " }}
+    {{ if $v }}{{ $out = $out | append $v }}{{ end }}
+  {{ end }}
+{{ end }}
+{{ return $out }}

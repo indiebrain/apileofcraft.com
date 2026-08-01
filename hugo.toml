@@ -1,0 +1,62 @@
+baseURL = "https://apileofcraft.com/"
+locale = "en-us"
+title = "A Pile of Craft"
+enableRobotsTXT = true
+enableEmoji = true
+
+# Emit pretty, readable timestamps in the local zone.
+timeZone = "America/New_York"
+
+# --- Content & taxonomy -------------------------------------------------------
+
+[taxonomies]
+  maker = "makers"
+  tag   = "tags"
+
+# --- Markup: Org mode + syntax highlighting -----------------------------------
+
+[markup]
+  # Allow raw HTML in content (needed for some media embeds). Org content is
+  # trusted because it is authored in this repository.
+  [markup.goldmark.renderer]
+    unsafe = true
+  [markup.highlight]
+    noClasses = false      # emit CSS classes so our stylesheet controls colors
+    lineNos = false
+    tabWidth = 2
+  [markup.tableOfContents]
+    startLevel = 2
+    endLevel   = 3
+
+# --- Site parameters ----------------------------------------------------------
+
+[params]
+  description = "Field notes on the things made by the people on one street."
+  tagline = "The things made by the people on my street."
+  author = "A Pile of Craft"
+  # Toggle features from config so content authors don't touch templates.
+  showReadingTime = true
+
+# --- Menus --------------------------------------------------------------------
+
+[menu]
+  [[menu.main]]
+    name = "Craft"
+    pageRef = "/posts"
+    weight = 10
+  [[menu.main]]
+    name = "Makers"
+    pageRef = "/makers"
+    weight = 20
+  [[menu.main]]
+    name = "About"
+    pageRef = "/about"
+    weight = 30
+
+# --- Services -----------------------------------------------------------------
+
+[services.rss]
+  limit = 20
+
+[pagination]
+  pagerSize = 10

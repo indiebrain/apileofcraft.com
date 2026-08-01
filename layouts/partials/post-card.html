@@ -1,0 +1,28 @@
+{{/* A single entry in a post listing. Expects a Page as context. */}}
+<li class="post-card">
+  <article>
+    {{ with .Params.cover }}
+      <a class="post-card__media" href="{{ $.RelPermalink }}" tabindex="-1" aria-hidden="true">
+        <img src="{{ . }}" alt="" loading="lazy" decoding="async">
+      </a>
+    {{ end }}
+    <div class="post-card__body">
+      <h3 class="post-card__title">
+        <a href="{{ .RelPermalink }}">{{ .Title }}</a>
+      </h3>
+      {{ with partial "func/aslist.html" .Params.makers }}
+        {{ $names := slice }}
+        {{ range . }}{{ $names = $names | append (replace . "_" " ") }}{{ end }}
+        <p class="post-card__maker">by {{ delimit $names ", " }}</p>
+      {{ end }}
+      <p class="post-card__meta">
+        <time datetime="{{ .Date.Format "2006-01-02" }}">{{ .Date.Format "January 2, 2006" }}</time>
+        {{ if and site.Params.showReadingTime .ReadingTime }}
+          <span aria-hidden="true">&middot;</span>
+          <span>{{ .ReadingTime }} min read</span>
+        {{ end }}
+      </p>
+      {{ with .Summary }}<p class="post-card__summary">{{ . }}</p>{{ end }}
+    </div>
+  </article>
+</li>

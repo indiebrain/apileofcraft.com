@@ -1,0 +1,13 @@
+#+TITLE: {{ replace .Name "-" " " | title }}
+#+DATE: {{ .Date }}
+#+DRAFT: true
+#+DESCRIPTION:
+# Makers and tags are arrays. Use the [] form. Join multi-word maker names
+# with underscores (Rosa_Delgado) — they are shown with spaces on the site.
+#+MAKERS[]:
+#+TAGS[]:
+# Put a cover image next to this file and name it below (e.g. cover.jpg).
+#+COVER:
+#+COVERALT:
+
+Write the story of the thing here.

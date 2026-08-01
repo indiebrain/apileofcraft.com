@@ -1,0 +1,44 @@
+{{ define "main" }}
+  <article class="wrap post">
+    <header class="post__header">
+      <h1 class="post__title">{{ .Title }}</h1>
+      <div class="post__meta">
+        {{ $makers := partial "func/aslist.html" .Params.makers }}
+        {{ with $makers }}
+          <p class="post__maker">Made by
+            {{ range $i, $m := . }}{{ if $i }}, {{ end }}<a href="{{ (printf "/makers/%s" ($m | urlize)) | relURL }}">{{ replace $m "_" " " }}</a>{{ end }}
+          </p>
+        {{ end }}
+        <p class="post__dateline">
+          <time datetime="{{ .Date.Format "2006-01-02" }}">{{ .Date.Format "January 2, 2006" }}</time>
+          {{ if and site.Params.showReadingTime .ReadingTime }}
+            <span aria-hidden="true">&middot;</span> {{ .ReadingTime }} min read
+          {{ end }}
+        </p>
+      </div>
+    </header>
+
+    {{ with .Params.cover }}
+      <figure class="post__cover">
+        <img src="{{ . }}" alt="{{ $.Params.coverAlt | default "" }}" loading="eager" decoding="async">
+        {{ with $.Params.coverCaption }}<figcaption>{{ . }}</figcaption>{{ end }}
+      </figure>
+    {{ end }}
+
+    <div class="post__body prose">
+      {{ .Content }}
+    </div>
+
+    {{ $tags := partial "func/aslist.html" .Params.tags }}
+    {{ with $tags }}
+      <footer class="post__footer">
+        <h2 class="post__tags-heading">Tagged</h2>
+        <ul class="tag-list">
+          {{ range . }}
+            <li><a class="tag" href="{{ (printf "/tags/%s" (. | urlize)) | relURL }}">{{ . }}</a></li>
+          {{ end }}
+        </ul>
+      </footer>
+    {{ end }}
+  </article>
+{{ end }}

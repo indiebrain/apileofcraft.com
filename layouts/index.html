@@ -1,0 +1,20 @@
+{{ define "main" }}
+  <section class="wrap home-hero">
+    <h1 class="home-hero__title">{{ site.Title }}</h1>
+    <p class="home-hero__lede">{{ site.Params.tagline }}</p>
+  </section>
+
+  <section class="wrap home-feed" aria-label="Latest craft">
+    <h2 class="section-heading">Latest craft</h2>
+    {{ $posts := where site.RegularPages "Section" "posts" }}
+    {{ if $posts }}
+      <ul class="post-list">
+        {{ range first 10 $posts }}
+          {{ partial "post-card.html" . }}
+        {{ end }}
+      </ul>
+    {{ else }}
+      <p class="empty-state">No posts yet — the first thing off the bench is coming soon.</p>
+    {{ end }}
+  </section>
+{{ end }}
