@@ -1,33 +1,63 @@
 {{/*
-  Manual light/dark switch. The page already follows the operating-system
-  preference through CSS; this lets a reader override it. The chosen value is
-  stored so it survives navigation, and applied before paint (see head.html) to
-  avoid a flash of the wrong theme.
+  Colour-theme control.
+
+  Default is "auto": no override is stored, so the page follows the operating
+  system via CSS `prefers-color-scheme` and live-updates when the OS flips.
+  Activating the button cycles Auto -> Light -> Dark -> Auto. A Light/Dark
+  choice is stored and applied before paint (see head.html) so it survives
+  navigation without a flash; choosing Auto clears the stored value.
+
+  The button starts hidden and is revealed by the script, so visitors without
+  JavaScript never see a dead control — they still get the system theme.
 */}}
-<button class="theme-toggle" type="button" id="theme-toggle" aria-pressed="false">
-  <span class="theme-toggle__label">Bench light: on</span>
+<button class="theme-toggle" type="button" id="theme-toggle" hidden>
+  <span class="theme-toggle__label">Bench light: auto</span>
 </button>
 <script>
   (function () {
     var btn = document.getElementById('theme-toggle');
-    var root = document.documentElement;
     var label = btn.querySelector('.theme-toggle__label');
-    function isDark() {
-      var t = root.getAttribute('data-theme');
-      if (t) return t === 'dark';
-      return window.matchMedia('(prefers-color-scheme: dark)').matches;
+    var root = document.documentElement;
+    var mq = window.matchMedia('(prefers-color-scheme: dark)');
+    var order = ['auto', 'light', 'dark'];
+    var text = { auto: 'Bench light: auto', light: 'Bench light: on', dark: 'Bench light: off' };
+
+    function stored() {
+      try {
+        var v = localStorage.getItem('apoc-theme');
+        return (v === 'light' || v === 'dark') ? v : 'auto';
+      } catch (e) { return 'auto'; }
     }
-    function sync() {
-      var dark = isDark();
-      btn.setAttribute('aria-pressed', String(dark));
-      label.textContent = dark ? 'Bench light: off' : 'Bench light: on';
+    function render(mode) {
+      label.textContent = text[mode];
+      var dark = mode === 'dark' || (mode === 'auto' && mq.matches);
+      var name = mode === 'auto'
+        ? 'Colour theme: auto, following system (currently ' + (dark ? 'dark' : 'light') + ').'
+        : 'Colour theme: ' + mode + '.';
+      btn.setAttribute('aria-label', name + ' Activate to change.');
     }
+    function apply(mode) {
+      if (mode === 'auto') {
+        root.removeAttribute('data-theme');
+        try { localStorage.removeItem('apoc-theme'); } catch (e) {}
+      } else {
+        root.setAttribute('data-theme', mode);
+        try { localStorage.setItem('apoc-theme', mode); } catch (e) {}
+      }
+      render(mode);
+    }
+
     btn.addEventListener('click', function () {
-      var next = isDark() ? 'light' : 'dark';
-      root.setAttribute('data-theme', next);
-      try { localStorage.setItem('apoc-theme', next); } catch (e) {}
-      sync();
+      var next = order[(order.indexOf(stored()) + 1) % order.length];
+      apply(next);
     });
-    sync();
+    // While in auto, keep the label truthful as the OS theme changes (CSS
+    // already restyles the page on its own).
+    mq.addEventListener('change', function () {
+      if (stored() === 'auto') render('auto');
+    });
+
+    render(stored());
+    btn.hidden = false;
   })();
 </script>
